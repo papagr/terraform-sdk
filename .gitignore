@@ -1,0 +1,7 @@
+# sdkcraft build artifacts
+*.sdk
+
+# workshop test artifacts
+.workshop/
+.workshop.lock
+workshop.yaml

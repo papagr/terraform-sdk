@@ -1,0 +1,18 @@
+summary: Launch a workshop with the terraform SDK
+
+prepare: |
+  envsubst '${BASE}' <workshop.yaml.in >workshop.yaml
+  workshop launch
+
+restore: |
+  workshop remove || true
+
+execute: |
+  workshop exec -- terraform version
+  # The plugin cache is the reason the mount plug exists; if the directory is
+  # missing, terraform silently stops caching providers.
+  workshop exec -- test -d /home/workshop/.terraform.d/plugin-cache
+  workshop exec -- sh -lc 'test -n "$TF_PLUGIN_CACHE_DIR"'
+
+debug: |
+  workshop tasks

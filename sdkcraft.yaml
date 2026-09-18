@@ -1,0 +1,62 @@
+name: terraform
+adopt-info: terraform
+summary: Infrastructure as code provisioning tool
+description: |
+  This SDK provides the Terraform CLI for provisioning and managing
+  infrastructure as code inside a workshop. The binary is fetched from the
+  official HashiCorp release archive at build time and checksum-verified
+  against the published SHA256SUMS. The provider plugin cache and CLI
+  credentials are persisted on the host across workshop updates, so
+  re-initialising a working directory does not re-download providers.
+license: BUSL-1.1
+platforms:
+  ubuntu@22.04:amd64:
+  ubuntu@22.04:arm64:
+  ubuntu@24.04:amd64:
+  ubuntu@24.04:arm64:
+  ubuntu@26.04:amd64:
+  ubuntu@26.04:arm64:
+
+plugs:
+  terraform-data:
+    interface: mount
+    workshop-target: /home/workshop/.terraform.d
+    mode: 0o700
+
+parts:
+  terraform:
+    plugin: dump
+    source: .
+    source-type: local
+    build-packages:
+      - unzip
+    override-pull: |
+      VERSION=$(cat "$CRAFT_PROJECT_DIR/VERSION")
+      craftctl set version="$VERSION"
+
+      # build-for arch, not build-on: these names line up with HashiCorp's
+      # (amd64, arm64) so no mapping table is needed.
+      ARCH="${CRAFT_ARCH_BUILD_FOR:-${CRAFT_TARGET_ARCH:-$(dpkg --print-architecture)}}"
+      BASE_URL="https://releases.hashicorp.com/terraform/${VERSION}"
+      ZIP="terraform_${VERSION}_linux_${ARCH}.zip"
+      SUMS="terraform_${VERSION}_SHA256SUMS"
+
+      curl -fsSLO "${BASE_URL}/${ZIP}"
+      curl -fsSLO "${BASE_URL}/${SUMS}"
+      grep " ${ZIP}\$" "${SUMS}" | sha256sum --check --strict -
+
+      unzip -q "${ZIP}" -d "$CRAFT_PART_SRC"
+      rm "${ZIP}" "${SUMS}"
+
+      # The prime entry below is silent if upstream ever drops the licence
+      # from the archive, so fail the build here instead.
+      if ! test -f "$CRAFT_PART_SRC/LICENSE.txt"; then
+        echo "LICENSE.txt missing from ${ZIP}; BUSL-1.1 requires it to ship with the binary" >&2
+        exit 1
+      fi
+    organize:
+      terraform: bin/terraform
+    prime:
+      - bin/terraform
+      # BUSL-1.1 requires the licence travel with the binary.
+      - LICENSE.txt

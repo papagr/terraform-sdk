@@ -1,0 +1,37 @@
+name: Build and Upload SDK
+
+on:
+  push:
+    branches:
+      - latest
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch name (e.g., latest)"
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-upload:
+    uses: canonical/sdkcraft-actions/.github/workflows/upload.yml@main
+    strategy:
+      matrix:
+        include:
+          - platforms: [ubuntu@22.04:amd64, ubuntu@24.04:amd64, ubuntu@26.04:amd64]
+            runs-on: [ubuntu-latest]
+          - platforms: [ubuntu@22.04:arm64, ubuntu@24.04:arm64, ubuntu@26.04:arm64]
+            runs-on: [ubuntu-24.04-arm]
+    with:
+      runs-on: ${{ toJSON(matrix.runs-on) }}
+      platforms: ${{ toJSON(matrix.platforms) }}
+      platform-flag: "--platform"
+      run-tests: true
+      # Publish to edge; promote a verified revision with
+      # `sdkcraft release <sdk> <revision> latest/stable`.
+      risk: "edge"
+    secrets:
+      SDKCRAFT_STORE_CREDENTIALS: ${{ secrets.SDKCRAFT_STORE_CREDENTIALS }}

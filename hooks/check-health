@@ -1,0 +1,13 @@
+if ! "$SDK"/bin/terraform version >/dev/null 2>&1; then
+    workshopctl set-health error "terraform binary is not executable"
+    exit 0
+fi
+
+# Separate check: the binary can be fine while the profile.d PATH wiring is not.
+if ! sudo -u workshop --login command -v terraform >/dev/null 2>&1; then
+    workshopctl set-health error "terraform is not on the workshop user's PATH"
+    exit 0
+fi
+
+"$SDK"/bin/terraform version | head -1
+workshopctl set-health okay

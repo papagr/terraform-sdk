@@ -1,0 +1,13 @@
+# Put terraform on PATH for every login shell and point the provider plugin
+# cache at the persisted mount, so `terraform init` reuses providers (the
+# azurerm provider alone is a few hundred MB) across workshop updates.
+cat <<PROFILE >/etc/profile.d/terraform.sh
+export PATH="${SDK}/bin:\$PATH"
+export TF_PLUGIN_CACHE_DIR="/home/workshop/.terraform.d/plugin-cache"
+PROFILE
+
+# terraform's own `-install-autocomplete` rewrites ~/.bashrc, which would be
+# undone on every refresh. Wire the same completion up system-wide instead.
+cat <<COMPLETION >/etc/bash_completion.d/terraform.sh
+complete -C ${SDK}/bin/terraform terraform
+COMPLETION

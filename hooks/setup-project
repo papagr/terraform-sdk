@@ -1,0 +1,3 @@
+# terraform refuses to use TF_PLUGIN_CACHE_DIR if the directory is absent --
+# it errors rather than creating it -- and the mount starts out empty.
+mkdir -p /home/workshop/.terraform.d/plugin-cache
