@@ -18,7 +18,7 @@ A minimal workshop:
 name: terraform-example
 base: ubuntu@24.04
 sdks:
-  - name: terraform
+  - name: terraform-papagr
     channel: latest/stable
 
 actions:

@@ -1,4 +1,4 @@
 name: test-terraform
 base: ${BASE}
 sdks:
-  - name: try-terraform
+  - name: try-terraform-papagr
