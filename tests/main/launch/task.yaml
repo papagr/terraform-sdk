@@ -1,4 +1,4 @@
-summary: Launch a workshop with the terraform SDK
+summary: Launch a workshop with the terraform-papagr SDK
 
 prepare: |
   envsubst '${BASE}' <workshop.yaml.in >workshop.yaml

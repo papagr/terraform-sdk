@@ -1,6 +1,8 @@
-name: terraform
+name: terraform-papagr
+title: Terraform CLI
+# adopt-info names the PART below, not the SDK.
 adopt-info: terraform
-summary: Infrastructure as code provisioning tool
+summary: Terraform CLI with a persistent provider cache, on amd64 and arm64
 description: |
   This SDK provides the Terraform CLI for provisioning and managing
   infrastructure as code inside a workshop. The binary is fetched from the
@@ -9,6 +11,8 @@ description: |
   credentials are persisted on the host across workshop updates, so
   re-initialising a working directory does not re-download providers.
 license: BUSL-1.1
+website: https://github.com/papagr/terraform-sdk
+contact: https://github.com/papagr/terraform-sdk/issues
 platforms:
   ubuntu@22.04:amd64:
   ubuntu@22.04:arm64:
