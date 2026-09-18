@@ -99,7 +99,12 @@ This SDK doesn't define any slots.
 
 ## License and copyright
 
-Terraform is licensed under the
+Copyright 2026 Nikolaos Papagrigoriou.
+
+This repository's wrapper code, configuration (`sdkcraft.yaml`), integration
+tests, and hooks are licensed under the [MIT License](./LICENSE).
+
+The Terraform CLI itself is licensed under the
 [Business Source License 1.1](https://github.com/hashicorp/terraform/blob/main/LICENSE).
 This SDK downloads the official upstream binary at build time and does not
 redistribute it.
