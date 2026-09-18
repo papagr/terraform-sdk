@@ -31,6 +31,10 @@ parts:
     build-packages:
       - unzip
     override-pull: |
+      # VERSION lives on the track branches (latest, and any track added
+      # later), never on main: Renovate bumps it there and both workflows
+      # build from there. A pack from main failing on this line is the
+      # design, not a missing file.
       VERSION=$(cat "$CRAFT_PROJECT_DIR/VERSION")
       craftctl set version="$VERSION"
 
