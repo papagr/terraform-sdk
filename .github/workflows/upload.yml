@@ -19,17 +19,25 @@ jobs:
   build-and-upload:
     uses: canonical/sdkcraft-actions/.github/workflows/upload.yml@main
     strategy:
+      # Without this, one architecture failing cancels the other mid-run.
+      fail-fast: false
       matrix:
         include:
           - platforms: [ubuntu@22.04:amd64, ubuntu@24.04:amd64, ubuntu@26.04:amd64]
             runs-on: [ubuntu-latest]
+            run-tests: true
           - platforms: [ubuntu@22.04:arm64, ubuntu@24.04:arm64, ubuntu@26.04:arm64]
             runs-on: [ubuntu-24.04-arm]
+            # GitHub's arm64 runners have no /dev/kvm, and tests/spread.yaml
+            # uses vm: true, so spread cannot allocate a machine there. These
+            # artifacts are therefore published WITHOUT being tested; real
+            # arm64 coverage needs a self-hosted runner with KVM.
+            run-tests: false
     with:
       runs-on: ${{ toJSON(matrix.runs-on) }}
       platforms: ${{ toJSON(matrix.platforms) }}
       platform-flag: "--platform"
-      run-tests: true
+      run-tests: ${{ matrix.run-tests }}
       # Publish to edge; promote a verified revision with
       # `sdkcraft release <sdk> <revision> latest/stable`.
       risk: "edge"
