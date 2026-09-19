@@ -9,26 +9,26 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
   cancel-in-progress: true
 
+# Tests live here, not in upload.yml. The reusable build workflow defaults
+# run-tests to true while the upload one defaults it to false, so the suite
+# runs once per change: Renovate opens a PR for a version bump, forward-port.yml
+# opens one for a recipe change, and both are tested before landing on latest.
+#
+# Runner images are pinned because ubuntu-latest migrates to 26.04 gradually
+# between 2026-10-19 and 2026-11-19, and arm64 has no -latest alias. The host
+# image affects LXD, snapd and KVM only -- artifacts are built per base inside
+# containers, driven by platforms: in sdkcraft.yaml.
 jobs:
-  build:
+  build-amd64:
     uses: canonical/sdkcraft-actions/.github/workflows/build.yml@main
-    # Runner images are pinned. ubuntu-latest migrates to 26.04 gradually
-    # between 2026-10-19 and 2026-11-19, which would otherwise make runs
-    # nondeterministic mid-rollout, and only arm64 has no -latest alias.
-    # The host image affects LXD, snapd and KVM only -- artifacts are built
-    # per base inside containers, driven by platforms: in sdkcraft.yaml.
-    strategy:
-      # Without this, one architecture failing cancels the other mid-run.
-      fail-fast: false
-      matrix:
-        include:
-          - runs-on: [ubuntu-24.04]
-            run-tests: true
-          # GitHub's arm64 runners have no /dev/kvm, and tests/spread.yaml uses
-          # vm: true, so spread cannot allocate a machine there. The reusable
-          # workflow defaults run-tests to true, so this must be set explicitly.
-          - runs-on: [ubuntu-24.04-arm]
-            run-tests: false
     with:
-      runs-on: ${{ toJSON(matrix.runs-on) }}
-      run-tests: ${{ matrix.run-tests }}
+      runs-on: '["ubuntu-24.04"]'
+
+  build-arm64:
+    uses: canonical/sdkcraft-actions/.github/workflows/build.yml@main
+    with:
+      runs-on: '["ubuntu-24.04-arm"]'
+      # GitHub's arm64 runners have no /dev/kvm, and tests/spread.yaml uses
+      # vm: true, so spread cannot allocate a machine there. Real arm64 test
+      # coverage would need a self-hosted runner with KVM.
+      run-tests: false
