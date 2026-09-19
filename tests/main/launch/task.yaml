@@ -1,7 +1,7 @@
 summary: Launch a workshop with the terraform-papagr SDK
 
 prepare: |
-  envsubst '${BASE}' <workshop.yaml.in >workshop.yaml
+  envsubst '${BASE}' <../workshop.yaml.in >workshop.yaml
   workshop launch
 
 restore: |
