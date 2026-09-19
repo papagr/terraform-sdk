@@ -18,6 +18,11 @@ concurrency:
 jobs:
   build-and-upload:
     uses: canonical/sdkcraft-actions/.github/workflows/upload.yml@main
+    # Runner images are pinned. ubuntu-latest migrates to 26.04 gradually
+    # between 2026-10-19 and 2026-11-19, which would otherwise make runs
+    # nondeterministic mid-rollout, and only arm64 has no -latest alias.
+    # The host image affects LXD, snapd and KVM only -- artifacts are built
+    # per base inside containers, driven by platforms: in sdkcraft.yaml.
     strategy:
       # Without this, one architecture failing cancels the other mid-run.
       fail-fast: false
@@ -28,10 +33,10 @@ jobs:
           # and executes all three spread variants -- full coverage. Running it
           # on the other legs repeats the identical three variants.
           - platforms: [ubuntu@24.04:amd64]
-            runs-on: [ubuntu-latest]
+            runs-on: [ubuntu-24.04]
             run-tests: true
           - platforms: [ubuntu@22.04:amd64, ubuntu@26.04:amd64]
-            runs-on: [ubuntu-latest]
+            runs-on: [ubuntu-24.04]
             run-tests: false
           - platforms: [ubuntu@22.04:arm64, ubuntu@24.04:arm64, ubuntu@26.04:arm64]
             runs-on: [ubuntu-24.04-arm]
