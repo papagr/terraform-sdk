@@ -53,7 +53,7 @@ parts:
       curl -fsSLO "${BASE_URL}/${SUMS}"
       grep " ${ZIP}\$" "${SUMS}" | sha256sum --check --strict -
 
-      unzip -q "${ZIP}" -d "$CRAFT_PART_SRC"
+      unzip -q -o "${ZIP}" -d "$CRAFT_PART_SRC"
       rm "${ZIP}" "${SUMS}"
 
       # The prime entry below is silent if upstream ever drops the licence
