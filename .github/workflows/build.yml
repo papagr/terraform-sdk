@@ -13,11 +13,17 @@ jobs:
   build:
     uses: canonical/sdkcraft-actions/.github/workflows/build.yml@main
     strategy:
+      # Without this, one architecture failing cancels the other mid-run.
+      fail-fast: false
       matrix:
         include:
           - runs-on: [ubuntu-latest]
-          # arm64 on GitHub-hosted runners is unverified: drop this entry if
-          # LXD or sdkcraft misbehaves there.
+            run-tests: true
+          # GitHub's arm64 runners have no /dev/kvm, and tests/spread.yaml uses
+          # vm: true, so spread cannot allocate a machine there. The reusable
+          # workflow defaults run-tests to true, so this must be set explicitly.
           - runs-on: [ubuntu-24.04-arm]
+            run-tests: false
     with:
       runs-on: ${{ toJSON(matrix.runs-on) }}
+      run-tests: ${{ matrix.run-tests }}
