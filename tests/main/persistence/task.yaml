@@ -1,0 +1,37 @@
+summary: The provider plugin cache survives a workshop refresh
+
+# This is the claim the terraform-data mount plug exists to make: ~/.terraform.d
+# outlives a refresh, so `terraform init` does not re-download providers every
+# time the workshop is updated. tests/main/launch only proves the cache
+# directory exists in a fresh workshop -- that assertion would still pass if the
+# mount were dropped entirely, which is precisely the regression worth catching.
+
+prepare: |
+  envsubst '${BASE}' <../workshop.yaml.in >workshop.yaml
+  workshop launch
+
+restore: |
+  workshop remove || true
+
+execute: |
+  CACHE=/home/workshop/.terraform.d/plugin-cache
+
+  # Stand in for a cached provider. Real ones are hundreds of MB; what matters
+  # here is whether anything under the mount survives at all.
+  workshop exec -- sh -c "echo persisted >$CACHE/marker"
+  workshop exec -- test -f "$CACHE/marker"
+
+  # A refresh only does work when the definition changed, so change it first --
+  # otherwise this asserts persistence across a no-op.
+  printf '\nactions:\n  noop: |\n    true\n' >>workshop.yaml
+  workshop refresh test-terraform
+
+  workshop exec -- test -f "$CACHE/marker"
+  [ "$(workshop exec -- cat "$CACHE/marker")" = "persisted" ]
+
+  # Credentials live beside the cache under the same 0o700 mount.
+  workshop exec -- test -d /home/workshop/.terraform.d
+
+debug: |
+  workshop tasks
+  workshop exec -- ls -la /home/workshop/.terraform.d || true
