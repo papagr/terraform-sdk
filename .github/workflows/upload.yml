@@ -29,9 +29,11 @@ jobs:
       platforms: '["ubuntu@22.04:amd64","ubuntu@24.04:amd64","ubuntu@26.04:amd64"]'
       platform-flag: "--platform"
       runs-on: '["ubuntu-24.04"]'
-      # Publish to edge; promote a verified revision with
-      # `sdkcraft release terraform-papagr <revision> latest/stable`.
-      risk: "edge"
+      # The PR that produced this commit was tested by build.yml, so the merge
+      # publishes straight to stable. The track is not set: the reusable
+      # workflow derives it from the branch name, which is what lets one
+      # workflow serve several track branches if more are added later.
+      risk: "stable"
     secrets:
       SDKCRAFT_STORE_CREDENTIALS: ${{ secrets.SDKCRAFT_STORE_CREDENTIALS }}
 
@@ -41,6 +43,6 @@ jobs:
       platforms: '["ubuntu@22.04:arm64","ubuntu@24.04:arm64","ubuntu@26.04:arm64"]'
       platform-flag: "--platform"
       runs-on: '["ubuntu-24.04-arm"]'
-      risk: "edge"
+      risk: "stable"
     secrets:
       SDKCRAFT_STORE_CREDENTIALS: ${{ secrets.SDKCRAFT_STORE_CREDENTIALS }}
