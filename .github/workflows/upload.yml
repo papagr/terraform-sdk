@@ -23,9 +23,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platforms: [ubuntu@22.04:amd64, ubuntu@24.04:amd64, ubuntu@26.04:amd64]
+          # One amd64 leg runs the suite. The reusable workflow invokes
+          # `sdkcraft test` unscoped, so that single leg packs every amd64 base
+          # and executes all three spread variants -- full coverage. Running it
+          # on the other legs repeats the identical three variants.
+          - platforms: [ubuntu@24.04:amd64]
             runs-on: [ubuntu-latest]
             run-tests: true
+          - platforms: [ubuntu@22.04:amd64, ubuntu@26.04:amd64]
+            runs-on: [ubuntu-latest]
+            run-tests: false
           - platforms: [ubuntu@22.04:arm64, ubuntu@24.04:arm64, ubuntu@26.04:arm64]
             runs-on: [ubuntu-24.04-arm]
             # GitHub's arm64 runners have no /dev/kvm, and tests/spread.yaml
