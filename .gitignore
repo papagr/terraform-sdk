@@ -11,3 +11,7 @@ workshop.yaml
 
 # spread reuse state -- machine-local record of the VM spread keeps between runs
 .spread-reuse.yaml
+
+# exported store credentials -- a live macaroon with publishing rights
+creds*.txt
+credentials*.txt
