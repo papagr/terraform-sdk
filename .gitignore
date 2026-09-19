@@ -1,7 +1,13 @@
 # sdkcraft build artifacts
 *.sdk
 
+# other
+*.log
+
 # workshop test artifacts
 .workshop/
 .workshop.lock
 workshop.yaml
+
+# spread reuse state -- machine-local record of the VM spread keeps between runs
+.spread-reuse.yaml
